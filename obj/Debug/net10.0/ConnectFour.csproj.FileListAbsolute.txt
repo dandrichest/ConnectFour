@@ -85,3 +85,4 @@ C:\Users\DANIEL\Documents\CSE325\ConnectFour\ConnectFour\obj\Debug\net10.0\scope
 C:\Users\DANIEL\Documents\CSE325\ConnectFour\ConnectFour\obj\Debug\net10.0\compressed\0vb7ii65mw-{0}-ss28v1ney7-ss28v1ney7.gz
 C:\Users\DANIEL\Documents\CSE325\ConnectFour\ConnectFour\obj\Debug\net10.0\compressed\8t7ubqbmk6-{0}-s3jspl522g-s3jspl522g.gz
 C:\Users\DANIEL\Documents\CSE325\ConnectFour\ConnectFour\obj\Debug\net10.0\compressed\qps0edvuu1-{0}-s3jspl522g-s3jspl522g.gz
+C:\Users\DANIEL\Documents\CSE325\ConnectFour\ConnectFour\obj\Debug\net10.0\ConnectFour.sourcelink.json
