@@ -1,0 +1,130 @@
+@using ConnectFour.Components
+@inject GameState State
+@inject IJSRuntime JS
+
+<div style="margin-bottom:10px;">
+    <label>Board Color: </label>
+    <input type="color" @bind="boardColor" />
+</div>
+
+<HeadContent>
+    <style>
+        :root {
+            --board-bg: @boardColor;
+            --player1: red;
+            --player2: blue;
+        }
+    </style>
+</HeadContent>
+
+<nav>
+    @for (byte i = 0; i < 7; i++)
+    {
+        var col = i;
+        <span
+    title="Click to play a piece"
+    class="@(State.IsColumnFull(col) ? "disabled" : "")"
+    @onclick="() => !State.IsColumnFull(col) ? PlayPiece(col) : Task.CompletedTask">
+    🔽
+</span>
+    }
+</nav>
+
+<article>
+    @winnerMessage
+    <button style="@ResetStyle" @onclick="ResetGame">Reset the game</button>
+    <br />
+    <span class="alert-danger">@errorMessage</span>
+    <span class="alert-info">@CurrentTurn</span>
+</article>
+
+<div>
+    <div class="board" style="--board-bg:@boardColor">
+        @for (var i = 0; i < 42; i++)
+        {
+            <span class="container">
+                <span></span>
+            </span>
+        }
+    </div>
+
+    @for (var i = 0; i < 42; i++)
+    {
+        <span class="@pieces[i]"></span>
+    }
+</div>
+
+
+@code {
+    private string[] pieces = new string[42];
+    private string winnerMessage = string.Empty;
+    private string errorMessage = string.Empty;
+
+    private string CurrentTurn =>
+        (winnerMessage == string.Empty) ? $"Player {State.PlayerTurn}'s Turn" : "";
+
+    private string ResetStyle =>
+        (winnerMessage == string.Empty) ? "display: none;" : "";
+
+private async Task PlayPiece(byte col)
+{
+    if (!string.IsNullOrEmpty(winnerMessage))
+        return;
+
+    errorMessage = string.Empty;
+
+    try
+    {
+        var player = State.PlayerTurn;
+        var turn = State.CurrentTurn;
+        var landingRow = State.PlayPiece(col);
+
+        if (landingRow == -1)
+        {
+            errorMessage = "Column is full!";
+            await JS.InvokeVoidAsync("playSound", "sounds/error.mp3");
+            return;
+        }
+
+        pieces[turn] = $"player{player} col{col} drop{landingRow}";
+
+        await JS.InvokeVoidAsync("playSound", "sounds/drop.mp3");
+
+        winnerMessage = State.CheckForWin() switch
+        {
+            GameState.WinState.Player1_Wins => "Player 1 Wins!",
+            GameState.WinState.Player2_Wins => "Player 2 Wins!",
+            GameState.WinState.Tie => "It's a tie!",
+            _ => ""
+        };
+
+        if (!string.IsNullOrEmpty(winnerMessage))
+        {
+            await JS.InvokeVoidAsync("playSound", "sounds/win.mp3");
+        }
+    }
+    catch (ArgumentException ex)
+    {
+        errorMessage = ex.Message;
+    }
+}
+
+
+
+    private void ResetGame()
+    {
+        State.ResetBoard();
+        pieces = new string[42];
+        winnerMessage = string.Empty;
+        errorMessage = string.Empty;
+    }
+
+    
+
+    protected override void OnInitialized()
+    {
+        State.ResetBoard();
+    }
+
+    private string boardColor = "#ffff00"; // default yellow
+}
